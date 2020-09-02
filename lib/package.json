@@ -5,12 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "compile":"tsc ./global.d.ts ./src/index.ts"
+    "compile": "tsc ./global.d.ts ./src/index.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/p5": "^0.9.1",
     "p5": "^1.1.9"
+  },
+  "devDependencies": {
+    "@types/p5": "^0.9.1"
   }
 }
