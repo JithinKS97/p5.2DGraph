@@ -1,6 +1,5 @@
 class Graph2D {
-  x: number;
-  y: number;
+  pos: p5.Vector;
   w: number;
   h: number;
   origin: p5.Vector;
@@ -33,14 +32,14 @@ class Graph2D {
     } = strokeWeightConfig;
 
     this.origin = createVector();
+    this.pos = createVector();
 
-    this.x = x;
-    this.y = y;
     this.w = w;
     this.h = h;
     this.unitX = unitX;
     this.unitY = unitY;
     this.origin.set(originX, originY);
+    this.pos.set(x, y);
 
     this.axisColor = axisColor;
     this.backgroundColor = backgroundColor;
@@ -54,7 +53,7 @@ class Graph2D {
 
   public display() {
     push();
-    translate(this.x, this.y);
+    translate(this.pos.x, this.pos.y);
     this.drawBoundingRect();
     this.drawAxes();
     pop();
@@ -64,10 +63,17 @@ class Graph2D {
     push();
     stroke(this.mainGridColor);
     strokeWeight(this.mainGridStrokeWight);
-    translate(this.x, this.y);
+    translate(this.pos.x, this.pos.y);
     this.drawMainVerticalGridLines();
     this.drawMainHorizontalGridLines();
     pop();
+  }
+
+  public pan() {
+    if (mouseIsPressed) {
+      this.origin.x += mouseX - pmouseX;
+      this.origin.y += mouseY - pmouseY;
+    }
   }
 
   private drawAxes() {
