@@ -9,6 +9,7 @@ function draw() {
   background(20);
   graph2D.display();
   graph2D.drawMainGrid();
+  graph2D.pan();
 }
 
 const colorConfig = {
@@ -21,12 +22,12 @@ const colorConfig = {
 const basicConfig = {
   x: 10,
   y: 10,
-  w: 400,
-  h: 200,
+  w: 500,
+  h: 300,
   originX: 100,
   originY: 50,
-  unitX: 20,
-  unitY: 20,
+  unitX: 30,
+  unitY: 30,
   unitXDivisions: 2,
   unitYDivisions: 2,
 };

@@ -1,6 +1,5 @@
 class Graph2D {
-  x: number;
-  y: number;
+  pos: p5.Vector;
   w: number;
   h: number;
   origin: p5.Vector;
@@ -20,6 +19,7 @@ class Graph2D {
     const { basicConfig, colorConfig, strokeWeightConfig } = config;
 
     const { x, y, w, h, originX, originY, unitX, unitY } = basicConfig;
+
     const {
       axis: axisColor,
       background: backgroundColor,
@@ -33,14 +33,14 @@ class Graph2D {
     } = strokeWeightConfig;
 
     this.origin = createVector();
+    this.pos = createVector();
 
-    this.x = x;
-    this.y = y;
     this.w = w;
     this.h = h;
     this.unitX = unitX;
     this.unitY = unitY;
     this.origin.set(originX, originY);
+    this.pos.set(x, y);
 
     this.axisColor = axisColor;
     this.backgroundColor = backgroundColor;
@@ -50,11 +50,24 @@ class Graph2D {
     this.axisStrokeWeight = axisStrokeWeight;
     this.boundaryStrokeWeight = boundaryStrokeWeight;
     this.mainGridStrokeWight = mainGridStrokeWeight;
+
+    //@ts-ignore
+    _curElement.mouseWheel(this.handlemouseWheel);
+  }
+
+  private handlemouseWheel = (e: MouseEvent) => {
+    this.zoom(e.offsetX, e.offsetY);
+  };
+
+  private zoom(x: number, y: number) {
+    if (this.isXWithinGraph(x) && this.isYWithinGraph(y)) {
+      // Think of the mathematics required for zoom???
+    }
   }
 
   public display() {
     push();
-    translate(this.x, this.y);
+    translate(this.pos.x, this.pos.y);
     this.drawBoundingRect();
     this.drawAxes();
     pop();
@@ -64,10 +77,17 @@ class Graph2D {
     push();
     stroke(this.mainGridColor);
     strokeWeight(this.mainGridStrokeWight);
-    translate(this.x, this.y);
+    translate(this.pos.x, this.pos.y);
     this.drawMainVerticalGridLines();
     this.drawMainHorizontalGridLines();
     pop();
+  }
+
+  public pan() {
+    if (mouseIsPressed && this.isPtWithinGraph(mouseX, mouseY)) {
+      this.origin.x += mouseX - pmouseX;
+      this.origin.y += mouseY - pmouseY;
+    }
   }
 
   private drawAxes() {
@@ -131,4 +151,7 @@ class Graph2D {
   private isYWithinGraph(y: number) {
     return y < this.h && y > 0;
   }
+
+  private isPtWithinGraph = (x: number, y: number) =>
+    this.isXWithinGraph(x - this.pos.x) && this.isYWithinGraph(y - this.pos.y);
 }
