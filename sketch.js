@@ -6,13 +6,16 @@ function setup() {
 }
 
 function draw() {
-  background(220);
-  graph2D.draw();
+  background(20);
+  graph2D.display();
+  graph2D.drawMainGrid();
 }
 
 const colorConfig = {
-  axis: [255, 255, 255],
-  background: [0, 0, 0],
+  axis: 255,
+  background: 0,
+  boundary: 100,
+  mainGrid: 100,
 };
 
 const basicConfig = {
@@ -22,14 +25,16 @@ const basicConfig = {
   h: 200,
   originX: 100,
   originY: 50,
-  unitX: 10,
-  unitY: 10,
+  unitX: 20,
+  unitY: 20,
   unitXDivisions: 2,
   unitYDivisions: 2,
 };
 
 const strokeWeightConfig = {
   axis: 2,
+  boundary: 1,
+  mainGrid: 1,
 };
 
 const config = {
