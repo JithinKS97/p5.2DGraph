@@ -1,3 +1,5 @@
+var isScrolling: any;
+
 class Graph2D {
   pos: p5.Vector;
   w: number;
@@ -14,6 +16,11 @@ class Graph2D {
   axisStrokeWeight: number;
   boundaryStrokeWeight: number;
   mainGridStrokeWight: number;
+  isZooming: boolean;
+  zoomStartOriginX: number;
+  zoomStartOriginY: number;
+  unitX0: number;
+  unitY0: number;
 
   constructor(config: Config) {
     const { basicConfig, colorConfig, strokeWeightConfig } = config;
@@ -50,21 +57,74 @@ class Graph2D {
     this.axisStrokeWeight = axisStrokeWeight;
     this.boundaryStrokeWeight = boundaryStrokeWeight;
     this.mainGridStrokeWight = mainGridStrokeWeight;
+    this.isZooming = false;
+    this.zoomStartOriginX = originX;
+    this.zoomStartOriginY = originY;
+    this.unitX0 = unitX;
+    this.unitY0 = unitY;
 
     //@ts-ignore
-    _curElement.mouseWheel(this.handlemouseWheel);
+    _curElement.mouseWheel(this.handleMouseWheel);
   }
 
-  private handlemouseWheel = (e: MouseEvent) => {
-    this.zoom(e.offsetX, e.offsetY);
+  private handleMouseWheel = (e: MouseWheelEvent) => {
+    if (!this.isZooming) {
+      this.isZooming = true;
+      this.setZoomStartOrigin();
+    }
+
+    this.resetIsZoomingIfFinished();
+
+    const xp = e.clientX - this.pos.x;
+    const yp = e.clientY - this.pos.y;
+
+    if (e.deltaY >= 0) {
+      this.zoom("in", xp, yp);
+    } else {
+      this.zoom("out", xp, yp);
+    }
   };
 
-  private zoom(x: number, y: number) {
-    if (this.isXWithinGraph(x) && this.isYWithinGraph(y)) {
-      // Think of the mathematics required for zoom???
+  setZoomStartOrigin = () => {
+    this.zoomStartOriginX = this.origin.x;
+    this.zoomStartOriginY = this.origin.y;
+  };
+
+  resetIsZoomingIfFinished = () => {
+    clearTimeout(isScrolling);
+    isScrolling = setTimeout(() => {
+      this.isZooming = false;
+      this.unitX0 = this.unitX;
+      this.unitY0 = this.unitY;
+    }, 100);
+  };
+
+  /**
+   *
+   * @param mode Zoom in or out
+   * @param xp x coordinate of pivot point
+   * @param yp y coordinate of pivot point
+   */
+  private zoom(mode: string, xp: number, yp: number) {
+    let scaleRate = 1;
+    if (mode === "in") {
+      scaleRate = 1.05;
+    } else if (mode === "out") {
+      scaleRate = 0.95;
     }
+    this.unitX *= scaleRate;
+    this.unitY *= scaleRate;
+
+    const scaleX = this.unitX / this.unitX0;
+    const scaleY = this.unitY / this.unitY0;
+
+    this.origin.x = xp - (xp - this.zoomStartOriginX) * scaleX;
+    this.origin.y = yp - (yp - this.zoomStartOriginY) * scaleY;
   }
 
+  /**
+   * Draws the graph bounding box with axes
+   */
   public display() {
     push();
     translate(this.pos.x, this.pos.y);
@@ -73,6 +133,9 @@ class Graph2D {
     pop();
   }
 
+  /**
+   * Draws the main grid in the graph
+   */
   public drawMainGrid() {
     push();
     stroke(this.mainGridColor);
@@ -83,6 +146,10 @@ class Graph2D {
     pop();
   }
 
+  /**
+   * To activate the pan feature in the graph
+   * Call inside draw loop
+   */
   public pan() {
     if (mouseIsPressed && this.isPtWithinGraph(mouseX, mouseY)) {
       this.origin.x += mouseX - pmouseX;
