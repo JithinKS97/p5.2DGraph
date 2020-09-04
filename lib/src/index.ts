@@ -52,19 +52,41 @@ class Graph2D {
     this.mainGridStrokeWight = mainGridStrokeWeight;
 
     //@ts-ignore
-    _curElement.mouseWheel(this.handlemouseWheel);
+    _curElement.mouseWheel(this.handleMouseWheel);
   }
 
-  private handlemouseWheel = (e: MouseEvent) => {
-    this.zoom(e.offsetX, e.offsetY);
+  private handleMouseWheel = (e: MouseWheelEvent) => {
+    const xp = e.clientX - this.pos.x;
+    const yp = e.clientY - this.pos.y;
+    if (e.deltaY >= 0) {
+      this.zoom("in", xp, yp);
+      console.log("up");
+    } else {
+      this.zoom("out", xp, yp);
+      console.log("out");
+    }
   };
 
-  private zoom(x: number, y: number) {
-    if (this.isXWithinGraph(x) && this.isYWithinGraph(y)) {
-      // Think of the mathematics required for zoom???
+  /**
+   *
+   * @param mode Zoom in or out
+   * @param xp x coordinate of pivot point
+   * @param yp y coordinate of pivot point
+   */
+  private zoom(mode: string, xp: number, yp: number) {
+    let scaleRate = 1;
+    if (mode === "in") {
+      scaleRate = 1.05;
+    } else if (mode === "out") {
+      scaleRate = 0.95;
     }
+    this.unitX *= scaleRate;
+    this.unitY *= scaleRate;
   }
 
+  /**
+   * Draws the graph bounding box with axes
+   */
   public display() {
     push();
     translate(this.pos.x, this.pos.y);
@@ -73,6 +95,9 @@ class Graph2D {
     pop();
   }
 
+  /**
+   * Draws the main grid in the graph
+   */
   public drawMainGrid() {
     push();
     stroke(this.mainGridColor);
@@ -83,6 +108,10 @@ class Graph2D {
     pop();
   }
 
+  /**
+   * To activate the pan feature in the graph
+   * Call inside draw loop
+   */
   public pan() {
     if (mouseIsPressed && this.isPtWithinGraph(mouseX, mouseY)) {
       this.origin.x += mouseX - pmouseX;
