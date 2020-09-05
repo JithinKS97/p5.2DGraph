@@ -1,3 +1,5 @@
+let isScrolling: any;
+
 class Graph2D {
   pos: p5.Vector;
   w: number;
@@ -15,6 +17,14 @@ class Graph2D {
   boundaryStrokeWeight: number;
   mainGridStrokeWight: number;
 
+  // Extra params which are not accepted from user
+  isZooming: boolean;
+  zoomStartOriginX: number;
+  zoomStartOriginY: number;
+  unitX0: number;
+  unitY0: number;
+  isZoomEnabled: boolean;
+
   constructor(config: Config) {
     const { basicConfig, colorConfig, strokeWeightConfig } = config;
 
@@ -26,6 +36,7 @@ class Graph2D {
       boundary: boundaryColor,
       mainGrid: mainGridColor,
     } = colorConfig;
+
     const {
       axis: axisStrokeWeight,
       boundary: boundaryStrokeWeight,
@@ -51,37 +62,16 @@ class Graph2D {
     this.boundaryStrokeWeight = boundaryStrokeWeight;
     this.mainGridStrokeWight = mainGridStrokeWeight;
 
+    // Additional properties that are not accepted from user
+    this.isZooming = false;
+    this.zoomStartOriginX = originX;
+    this.zoomStartOriginY = originY;
+    this.unitX0 = unitX;
+    this.unitY0 = unitY;
+    this.isZoomEnabled = false;
+
     //@ts-ignore
-    _curElement.mouseWheel(this.handleMouseWheel);
-  }
-
-  private handleMouseWheel = (e: MouseWheelEvent) => {
-    const xp = e.clientX - this.pos.x;
-    const yp = e.clientY - this.pos.y;
-    if (e.deltaY >= 0) {
-      this.zoom("in", xp, yp);
-      console.log("up");
-    } else {
-      this.zoom("out", xp, yp);
-      console.log("out");
-    }
-  };
-
-  /**
-   *
-   * @param mode Zoom in or out
-   * @param xp x coordinate of pivot point
-   * @param yp y coordinate of pivot point
-   */
-  private zoom(mode: string, xp: number, yp: number) {
-    let scaleRate = 1;
-    if (mode === "in") {
-      scaleRate = 1.05;
-    } else if (mode === "out") {
-      scaleRate = 0.95;
-    }
-    this.unitX *= scaleRate;
-    this.unitY *= scaleRate;
+    _curElement.mouseWheel(this.handleScroll);
   }
 
   /**
@@ -117,6 +107,70 @@ class Graph2D {
       this.origin.x += mouseX - pmouseX;
       this.origin.y += mouseY - pmouseY;
     }
+  }
+
+  public zoom() {
+    this.isZoomEnabled = true;
+  }
+
+  private handleScroll = (e: MouseWheelEvent) => {
+    if (!this.isZooming) {
+      this.isZooming = true;
+      this.setZoomStartOrigin();
+    }
+
+    this.resetZoomParamsWhenScrollFinished();
+
+    const xp = e.clientX - this.pos.x;
+    const yp = e.clientY - this.pos.y;
+
+    if (e.deltaY >= 0) {
+      this.zoomOnScroll("in", xp, yp);
+    } else {
+      this.zoomOnScroll("out", xp, yp);
+    }
+  };
+
+  private setZoomStartOrigin = () => {
+    this.zoomStartOriginX = this.origin.x;
+    this.zoomStartOriginY = this.origin.y;
+  };
+
+  private resetZoomParamsWhenScrollFinished = () => {
+    clearTimeout(isScrolling);
+    isScrolling = setTimeout(() => {
+      this.isZooming = false;
+      this.unitX0 = this.unitX;
+      this.unitY0 = this.unitY;
+    }, 100);
+  };
+
+  /**
+   *
+   * @param mode Zoom in or out
+   * @param xp x coordinate of pivot point
+   * @param yp y coordinate of pivot point
+   */
+  private zoomOnScroll(mode: string, xp: number, yp: number) {
+    if (!this.isZoomEnabled) {
+      return;
+    }
+
+    let scaleRate: number = 1;
+
+    if (mode === "in") {
+      scaleRate = 1.05;
+    } else if (mode === "out") {
+      scaleRate = 0.95;
+    }
+    this.unitX *= scaleRate;
+    this.unitY *= scaleRate;
+
+    const scaleX: number = this.unitX / this.unitX0;
+    const scaleY: number = this.unitY / this.unitY0;
+
+    this.origin.x = xp - (xp - this.zoomStartOriginX) * scaleX;
+    this.origin.y = yp - (yp - this.zoomStartOriginY) * scaleY;
   }
 
   private drawAxes() {

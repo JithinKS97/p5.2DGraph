@@ -7,9 +7,14 @@ function setup() {
 
 function draw() {
   background(20);
+  drawGraph();
+}
+
+function drawGraph() {
   graph2D.display();
   graph2D.drawMainGrid();
   graph2D.pan();
+  graph2D.zoom();
 }
 
 const colorConfig = {
