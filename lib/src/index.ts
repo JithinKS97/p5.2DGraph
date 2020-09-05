@@ -121,8 +121,12 @@ class Graph2D {
 
     this.resetZoomParamsWhenScrollFinished();
 
-    const xp = e.clientX - this.pos.x;
-    const yp = e.clientY - this.pos.y;
+    const xp = e.offsetX - this.pos.x;
+    const yp = e.offsetY - this.pos.y;
+
+    if (!this.isPtWithinGraph(xp, yp)) {
+      return;
+    }
 
     if (e.deltaY >= 0) {
       this.zoomOnScroll("in", xp, yp);
