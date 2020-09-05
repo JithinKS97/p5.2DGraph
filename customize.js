@@ -26,6 +26,7 @@ function createSubConfigElements(subConfig, mainConfig) {
 function createLabelAndInput(value, subConfig, mainConfig) {
   const labelEl = createDiv(subConfig);
   labelEl.parent("customize-container");
+  labelEl.style("margin", "0.3rem 0");
 
   const inputEl = createInput();
   inputEl.parent("customize-container");

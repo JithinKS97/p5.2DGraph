@@ -19,6 +19,7 @@ function draw() {
 function drawGraph() {
   graph2D.display();
   graph2D.drawMainGrid();
+  graph2D.drawSubGrid();
   graph2D.pan();
   graph2D.zoom();
 }

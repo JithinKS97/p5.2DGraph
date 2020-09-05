@@ -2,7 +2,8 @@ const colorConfig = {
   axis: 255,
   background: 0,
   boundary: 100,
-  mainGrid: 100,
+  mainGrid: [0, 120, 180],
+  subGrid: 40,
 };
 
 const basicConfig = {
@@ -12,16 +13,17 @@ const basicConfig = {
   h: 300,
   originX: 100,
   originY: 50,
-  unitX: 30,
-  unitY: 30,
+  unitX: 40,
+  unitY: 40,
   unitXDivisions: 2,
   unitYDivisions: 2,
 };
 
 const strokeWeightConfig = {
-  axis: 2,
+  axis: 3,
   boundary: 1,
-  mainGrid: 1,
+  mainGrid: 2,
+  subGrid: 1,
 };
 
 const config = {
