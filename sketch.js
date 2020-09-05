@@ -3,7 +3,7 @@ let graph2D;
 function setup() {
   const cnv = createCanvas(640, 400);
   cnv.parent("sketch-holder");
-  createElementsFromConfig(config);
+  createConfigEditElements(config);
   graph2D = new Graph2D(config);
 }
 

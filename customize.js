@@ -1,6 +1,6 @@
 window.config = config;
 
-function createElementsFromConfig(config) {
+function createConfigEditElements(config) {
   const configEntries = Object.entries(config);
   configEntries.forEach((configEntry) => {
     createHeading(configEntry[0]);
@@ -47,34 +47,34 @@ function createLabelAndInput(value, subConfig, mainConfig) {
 
 function onConfigChange(mainConfig, subConfig) {
   return (e) => {
-    setNewConfig(mainConfig, subConfig, e.target.value);
+    updateConfig(mainConfig, subConfig, e.target.value);
   };
 }
 
-function onButtonPress(mainConfig, subConfig, el, mode) {
+function onButtonPress(mainConfig, subConfig, inputEl, mode) {
   return () => {
+    let newValue = Number(inputEl.value());
     if (mode === "+") {
-      const newValue = Number(el.value()) + 5;
-      setNewConfig(mainConfig, subConfig, newValue);
-      el.value(newValue);
+      newValue += 5;
     } else if (mode === "-") {
-      const newValue = Number(el.value()) - 5;
-      setNewConfig(mainConfig, subConfig, newValue);
-      el.value(newValue);
+      newValue -= 5;
     }
+    updateConfig(mainConfig, subConfig, newValue);
+    inputEl.value(newValue);
   };
 }
 
-setNewConfig = (mainConfig, subConfig, newValue) => {
+updateConfig = (mainConfig, subConfig, newValue) => {
   let newConfig = window.config;
 
   if (Number(newValue) || newValue === "0") {
     newValue = Number(newValue);
+  } else if (isColor(newValue)) {
+    newValue = getColorArray(newValue);
   } else {
-    if (isColor(newValue)) {
-      newValue = getColorArray(newValue);
-    }
+    return;
   }
+
   newConfig = {
     ...newConfig,
     [mainConfig]: {
@@ -82,8 +82,10 @@ setNewConfig = (mainConfig, subConfig, newValue) => {
       [subConfig]: newValue,
     },
   };
+
   window.config = newConfig;
   initialize(newConfig);
+
   return newConfig;
 };
 
