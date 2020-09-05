@@ -86,8 +86,6 @@ updateConfig = (mainConfig, subConfig, newValue) => {
 
   window.config = newConfig;
   initialize(newConfig);
-
-  return newConfig;
 };
 
 const isColor = (value) => {

@@ -240,10 +240,10 @@ class Graph2D {
   }
 
   public zoom() {
-    this.enableDisableZoom();
+    this.disableZoomIfTimeout();
   }
 
-  private enableDisableZoom() {
+  private disableZoomIfTimeout() {
     clearTimeout(this.isZoomEnabled);
     this.isZoomEnabled = setTimeout(() => {
       this.isZoomEnabled = false;

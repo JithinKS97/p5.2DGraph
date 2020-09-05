@@ -2,7 +2,7 @@ const colorConfig = {
   axis: 255,
   background: 0,
   boundary: 100,
-  mainGrid: [0, 120, 180],
+  mainGrid: [0, 90, 130],
   subGrid: 40,
 };
 
