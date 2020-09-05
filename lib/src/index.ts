@@ -73,7 +73,7 @@ class Graph2D {
       this.setZoomStartOrigin();
     }
 
-    this.resetIsZoomingIfFinished();
+    this.resetIsZoomParamsWhenFinished();
 
     const xp = e.clientX - this.pos.x;
     const yp = e.clientY - this.pos.y;
@@ -90,7 +90,7 @@ class Graph2D {
     this.zoomStartOriginY = this.origin.y;
   };
 
-  resetIsZoomingIfFinished = () => {
+  resetIsZoomParamsWhenFinished = () => {
     clearTimeout(isScrolling);
     isScrolling = setTimeout(() => {
       this.isZooming = false;
