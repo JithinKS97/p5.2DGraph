@@ -11,3 +11,30 @@ canvas {
 h1 {
   margin: 1rem 0;
 }
+.outer-container {
+  display: flex;
+  flex-direction: row;
+}
+
+#customize-container {
+  height: 90vh;
+  overflow-y: auto;
+  width: 40vw;
+  padding: 1rem;
+  padding-left: 2rem;
+  border: 1px solid grey;
+  margin: 2rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+input {
+  padding: 0.2rem;
+}
+
+.customize-header {
+  padding: 0;
+  margin: 0;
+}

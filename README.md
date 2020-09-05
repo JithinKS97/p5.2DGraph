@@ -1,4 +1,4 @@
-# p5.graph
+# p5.2DGraph
 
 Minimal graph calculator for p5.js written in Typescript.
 

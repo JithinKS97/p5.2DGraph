@@ -173,6 +173,12 @@ class Graph2D {
     const scaleX: number = this.unitX / this.unitX0;
     const scaleY: number = this.unitY / this.unitY0;
 
+    /**
+     * Logic for scaling
+     *
+     * The coordinates of origin is changed wrt zooming
+     * New origin coordinate = Pivot coordinate + Initial origin coordinate * scaleFactor
+     */
     this.origin.x = xp - (xp - this.zoomStartOriginX) * scaleX;
     this.origin.y = yp - (yp - this.zoomStartOriginY) * scaleY;
   }
