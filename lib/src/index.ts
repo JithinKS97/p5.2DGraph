@@ -359,10 +359,10 @@ class Graph2D {
   };
 
   plotEquation = (equation: string) => {
-    const leftMostX = this.getX(this.pos.x);
-    const rightMostX = this.getX(this.pos.x + this.w);
-    const noOfSamples = 100;
-    const interval = (rightMostX - leftMostX) / noOfSamples;
+    const leftMostX = this.getX(0);
+    const rightMostX = this.getX(width);
+    const noOfSamples = width / (this.unitX / 30);
+    let interval = (rightMostX - leftMostX) / noOfSamples;
     const xCoords = [];
     for (let x = leftMostX; x < rightMostX; x += interval) {
       xCoords.push(x);
@@ -370,21 +370,8 @@ class Graph2D {
     const yCoords = xCoords.map(f(equation));
     for (let i = 1; i < xCoords.length; i++) {
       stroke(255, 0, 0);
-      strokeWeight(2);
-
-      if (
-        this.getYPixel(yCoords[i - 1]) < this.pos.y &&
-        this.getYPixel(yCoords[i]) < this.pos.y
-      ) {
-        continue;
-      }
-
-      if (
-        this.getYPixel(yCoords[i - 1]) > this.pos.y + this.h &&
-        this.getYPixel(yCoords[i]) > this.pos.y + this.h
-      ) {
-        continue;
-      }
+      strokeWeight(1.5);
+      smooth();
 
       line(
         this.getXPixel(xCoords[i - 1]),
