@@ -7,12 +7,12 @@ const colorConfig = {
 };
 
 const basicConfig = {
-  x: 10,
-  y: 10,
+  x: 50,
+  y: 50,
   w: 500,
   h: 300,
-  originX: 100,
-  originY: 50,
+  originX: 250,
+  originY: 150,
   unitX: 40,
   unitY: 40,
   unitXDivisions: 2,

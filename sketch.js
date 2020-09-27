@@ -22,5 +22,5 @@ function drawGraph() {
   graph2D.drawSubGrid();
   graph2D.pan();
   graph2D.zoom();
-  graph2D.plot(`x^x`);
+  graph2D.plot(`x*x`);
 }
