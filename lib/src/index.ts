@@ -28,6 +28,7 @@ class Graph2D {
   unitX0: number;
   unitY0: number;
   isZoomEnabled: any;
+  plottedEquations: Set<string>;
 
   constructor(config: Config) {
     const { basicConfig, colorConfig, strokeWeightConfig } = config;
@@ -90,6 +91,7 @@ class Graph2D {
     this.unitX0 = unitX;
     this.unitY0 = unitY;
     this.isZoomEnabled = false;
+    this.plottedEquations = new Set();
 
     //@ts-ignore
     _curElement.mouseWheel(this.handleScroll);
@@ -106,6 +108,53 @@ class Graph2D {
     pop();
   }
 
+  /**
+   * Draws the main grid in the graph
+   */
+  public drawMainGrid() {
+    push();
+    stroke(this.mainGridColor);
+    strokeWeight(this.mainGridStrokeWeight);
+    translate(this.pos.x, this.pos.y);
+    this.drawMainVerticalGridLines();
+    this.drawMainHorizontalGridLines();
+    pop();
+  }
+
+  public drawSubGrid() {
+    push();
+    stroke(this.subGridColor);
+    strokeWeight(this.subGridStrokeWeight);
+    translate(this.pos.x, this.pos.y);
+    this.drawVerticalSubGridLines();
+    this.drawHorizontalSubGridLines();
+    pop();
+  }
+
+  /**
+   * To activate the pan feature in the graph
+   * Call inside draw loop
+   */
+  public pan() {
+    if (mouseIsPressed && this.isPtWithinGraph(mouseX, mouseY)) {
+      this.origin.x += mouseX - pmouseX;
+      this.origin.y += mouseY - pmouseY;
+    }
+  }
+
+  public zoom() {
+    this.disableZoomIfTimeout();
+  }
+
+  public plot(expr: string) {
+    this.plottedEquations.add(expr);
+    this.plotEquations(Array.from(this.plottedEquations));
+  }
+
+  private plotEquations(equations: string[]) {
+    equations.forEach((equation) => this.plotEquation(equation));
+  }
+
   private drawBoundingRect() {
     fill(this.backgroundColor);
     strokeWeight(this.boundaryStrokeWeight);
@@ -118,19 +167,6 @@ class Graph2D {
     strokeWeight(this.axisStrokeWeight);
     this.drawVerticalGridLine(this.origin.x);
     this.drawHorizontalGridLine(this.origin.y);
-  }
-
-  /**
-   * Draws the main grid in the graph
-   */
-  public drawMainGrid() {
-    push();
-    stroke(this.mainGridColor);
-    strokeWeight(this.mainGridStrokeWeight);
-    translate(this.pos.x, this.pos.y);
-    this.drawMainVerticalGridLines();
-    this.drawMainHorizontalGridLines();
-    pop();
   }
 
   private drawMainVerticalGridLines() {
@@ -159,16 +195,6 @@ class Graph2D {
     for (let y = yStart; y > yEnd; y -= this.unitY) {
       this.drawHorizontalGridLine(y);
     }
-  }
-
-  public drawSubGrid() {
-    push();
-    stroke(this.subGridColor);
-    strokeWeight(this.subGridStrokeWeight);
-    translate(this.pos.x, this.pos.y);
-    this.drawVerticalSubGridLines();
-    this.drawHorizontalSubGridLines();
-    pop();
   }
 
   private drawVerticalSubGridLines() {
@@ -226,21 +252,6 @@ class Graph2D {
     if (this.isYWithinGraph(y)) {
       line(0, y, this.w, y);
     }
-  }
-
-  /**
-   * To activate the pan feature in the graph
-   * Call inside draw loop
-   */
-  public pan() {
-    if (mouseIsPressed && this.isPtWithinGraph(mouseX, mouseY)) {
-      this.origin.x += mouseX - pmouseX;
-      this.origin.y += mouseY - pmouseY;
-    }
-  }
-
-  public zoom() {
-    this.disableZoomIfTimeout();
   }
 
   private disableZoomIfTimeout() {
@@ -330,4 +341,48 @@ class Graph2D {
 
   private isPtWithinGraph = (x: number, y: number) =>
     this.isXWithinGraph(x - this.pos.x) && this.isYWithinGraph(y - this.pos.y);
+
+  private getX = (xPixel: number) => {
+    return (xPixel - this.pos.x - this.origin.x) / this.unitX;
+  };
+
+  private getY = (yPixel: number) => {
+    return (yPixel - this.pos.y - this.origin.y) / -this.unitY;
+  };
+
+  private getXPixel = (x: number) => {
+    return this.pos.x + this.origin.x + x * this.unitX;
+  };
+
+  private getYPixel = (y: number) => {
+    return this.pos.y + this.origin.y - y * this.unitY;
+  };
+
+  plotEquation = (equation: string) => {
+    const leftMostX = this.getX(0);
+    const rightMostX = this.getX(width);
+    const noOfSamples = width / (this.unitX / 30);
+    let interval = (rightMostX - leftMostX) / noOfSamples;
+    const xCoords = [];
+    for (let x = leftMostX; x < rightMostX; x += interval) {
+      xCoords.push(x);
+    }
+    const yCoords = xCoords.map(f(equation));
+    for (let i = 1; i < xCoords.length; i++) {
+      stroke(255, 0, 0);
+      strokeWeight(1.5);
+      smooth();
+
+      line(
+        this.getXPixel(xCoords[i - 1]),
+        this.getYPixel(yCoords[i - 1]),
+        this.getXPixel(xCoords[i]),
+        this.getYPixel(yCoords[i])
+      );
+    }
+  };
 }
+
+const f = (equation: string) => (x: number) => {
+  return eval(equation);
+};
